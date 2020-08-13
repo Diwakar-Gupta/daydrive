@@ -1,4 +1,3 @@
-import 'db_test.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -30,17 +29,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int id = 0;
-  String name = "july", des = "";
-  TextEditingController namecontroller, descontroller;
+  int _counter = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    namecontroller = TextEditingController();
-    descontroller = TextEditingController();
-    namecontroller.text = name;
-    descontroller.text = des;
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
   }
 
   @override
@@ -53,54 +47,21 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            TextFormField(
-              initialValue: id.toString(),
-              onChanged: (value) {
-                print("changed id");
-                id = int.parse(value);
-              },
+            Text(
+              'You have pushed the button this many times:',
             ),
-            TextFormField(
-              controller: namecontroller,
-              onChanged: (value) {
-                print("changed name");
-                name = value;
-              },
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headline4,
             ),
-            TextFormField(
-              controller: descontroller,
-              onChanged: (value) {
-                print("changed des");
-                des = value;
-              },
-            ),
-            Row(
-              children: [
-                RaisedButton(
-                    onPressed: () async {
-                      var a = await Act.create(name: name, des: des);
-                      print(a.toMap());
-                    },
-                    child: Text("Create")),
-                RaisedButton(
-                  onPressed: () async {
-                    var acts = await Act.all();
-                    for (var act in acts) {
-                      if (act.pk == id) {
-                        setState(() {
-                          namecontroller.text = act.name;
-                          descontroller.text = act.des;
-                        });
-                      }
-                    }
-                  },
-                  child: Text("get"),
-                ),
-              ],
-            )
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
