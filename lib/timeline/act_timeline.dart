@@ -19,7 +19,7 @@ class ActTimelineState extends State<ActTimeline> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -32,22 +32,35 @@ class ActTimelineState extends State<ActTimeline> {
       child: Theme(
         data: Theme.of(context).copyWith(
           accentColor: const Color(0xFF117E69).withOpacity(0.2),
+          chipTheme: Theme.of(context).chipTheme.copyWith(
+                disabledColor: Colors.transparent,
+                labelStyle: GoogleFonts.dosis(
+                  fontSize: 18,
+                  color: Colors.black45,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
         ),
         child: SafeArea(
           child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(
+                '01 June 2020 16:00',
+                style: GoogleFonts.dosis(
+                  fontSize: 20,
+                  color: Colors.white.withOpacity(0.7),
+                ),
+              ),
+            ),
             backgroundColor: Colors.transparent,
             extendBodyBehindAppBar: true,
             body: Center(
               child: Column(
                 children: <Widget>[
                   const SizedBox(height: 16),
-                  Text(
-                    '01 June 2020 16:00',
-                    style: GoogleFonts.dosis(
-                      fontSize: 20,
-                      color: Colors.white.withOpacity(0.7),
-                    ),
-                  ),
+
                   // _Scoreboard(),
                   Expanded(
                     child: CustomScrollView(
@@ -117,6 +130,31 @@ class ActTimelineState extends State<ActTimeline> {
   }
 }
 
+class ActiveActs extends StatefulWidget {
+  @override
+  _ActiveActsState createState() => _ActiveActsState();
+}
+
+class _ActiveActsState extends State<ActiveActs> {
+  // final GlobalKey<AnimatedListState> _active = GlobalKey<AnimatedListState>();
+  final list = [
+    FilterChip(selected: true, label: Text('movie'), onSelected: null),
+    FilterChip(label: Text('popcorn'), onSelected: null),
+    ChoiceChip(label: Text('whatsapp'), selected: true),
+    ChoiceChip(label: Text('whatsapp'), selected: false),
+    FilterChip(label: Text('popcorn'), onSelected: null),
+    ChoiceChip(label: Text('whatsapp'), selected: true),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.spaceEvenly,
+      children: list,
+    );
+  }
+}
+
 class _TimelineAct extends StatelessWidget {
   const _TimelineAct({Key key, this.data}) : super(key: key);
 
@@ -146,7 +184,8 @@ class _TimelineAct extends StatelessWidget {
             indicatorStyle: IndicatorStyle(
               width: 40,
               height: 40,
-              indicator: _TimelineActIndicator(time: event.hr.toString()+":"+event.mm.toString()),
+              indicator: _TimelineActIndicator(
+                  time: event.hr.toString() + ":" + event.mm.toString()),
               drawGap: true,
             ),
             topLineStyle: LineStyle(

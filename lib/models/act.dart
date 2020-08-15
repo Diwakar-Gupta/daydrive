@@ -34,7 +34,6 @@ Future<Database> main() async {
 
 Future<Database> database = main();
 
-
 class TimeDate {
   int date; //YYYYMMDD
   int time; //HHMM
@@ -57,20 +56,24 @@ class TimeDate {
     return TimeDate(time: time, date: date);
   }
 
-  int day(){
-    return date%100;
+  int day() {
+    return date % 100;
   }
-  int month(){
-    return (date~/100)%100;
+
+  int month() {
+    return (date ~/ 100) % 100;
   }
-  int year(){
-    return (date~/10000);
+
+  int year() {
+    return (date ~/ 10000);
   }
-  int hour(){
-    return time~/100;
+
+  int hour() {
+    return time ~/ 100;
   }
-  int min(){
-    return time%100;
+
+  int min() {
+    return time % 100;
   }
 }
 
@@ -93,15 +96,22 @@ class Act {
   String sdes, edes;
 
   TimeDate starttime;
-  TimeDate endtime= TimeDate(time: 0, date:0);
+  TimeDate endtime = TimeDate(time: 0, date: 0);
 
   Act(
       {this.name,
       this.sdes = "",
       this.starttime,
-      this.edes="",
+      this.edes = "",
       this.endtime,
       this.pk = 0});
+
+  Future<bool> done(String des, TimeDate endtime) async {
+    this.edes = des;
+    this.endtime = endtime;
+    await update();
+    return true;
+  }
 
   static Future<Act> create({String name, String sdes}) async {
     var obj = Act(name: name, sdes: sdes, starttime: TimeDate.now());
@@ -115,9 +125,9 @@ class Act {
       'sdes': sdes,
       'starttime': starttime.time,
       'startdate': starttime.date,
-      'edes':edes,
-      'endtime':endtime.time,
-      'enddate':endtime.date,
+      'edes': edes,
+      'endtime': endtime.time,
+      'enddate': endtime.date,
     };
   }
 
@@ -153,10 +163,10 @@ class Act {
       return Act(
         name: maps[i]['name'],
         sdes: maps[i]['des'],
-        starttime: TimeDate(time:maps[i]['starttime'], date:maps[i]['startdate']),
-        edes:maps[i]['edes'],
-        endtime: TimeDate(time:maps[i]['endtime'], date:maps[i]['enddate']),
-        
+        starttime:
+            TimeDate(time: maps[i]['starttime'], date: maps[i]['startdate']),
+        edes: maps[i]['edes'],
+        endtime: TimeDate(time: maps[i]['endtime'], date: maps[i]['enddate']),
         pk: maps[i]['pk'],
       );
     });
