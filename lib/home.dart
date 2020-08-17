@@ -8,15 +8,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Act> list = [
-    Act(name: "movie", starttime: TimeDate.now()),
-    Act(name: "tv", starttime: TimeDate.now()),
-    Act(name: "class", starttime: TimeDate.now()),
-    Act(name: "cricket", starttime: TimeDate.now()),
-    Act(name: "kapil sharma show", starttime: TimeDate.now()),
-    Act(name: "fun", starttime: TimeDate.now()),
-    Act(name: "walk", starttime: TimeDate.now()),
-  ];
+  List<Act> list;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Act.inRange(to: TimeDate(datetime: 0)).then((value) => list = value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: FlatButton(
                   onPressed: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (contex) => ActTimeline()));
+                        MaterialPageRoute(builder: (contex) => ActTimeline(list)));
                   },
                   child: Text(
                     'timeline',
@@ -60,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 250,
               child: NotificationListener<ActCreate>(
                 onNotification: (ActCreate nact) {
+                  nact.act.insert();
                   setState(() {
                     list.add(nact.act);
                   });
@@ -148,7 +148,8 @@ class _CreateAct extends StatelessWidget {
         height: 50,
         child: RaisedButton(
           onPressed: () {
-            ActCreate(Act(name: titlecontroler.text, starttime: TimeDate.now()))
+            ActCreate(Act(
+                    name: titlecontroler.text, startdatetime: TimeDate.now(), enddatetime: TimeDate(datetime: 0)))
                 .dispatch(context);
           },
           child: Text(
@@ -177,33 +178,30 @@ class __ActivePickerState extends State<_ActivePicker> {
       constraints: BoxConstraints(maxHeight: 100),
       child: Card(
         color: Colors.transparent,
-        child: Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: List<Widget>.generate(widget.list.length, (index) {
-            var e = widget.list[index];
-            return Chip(
-              deleteButtonTooltipMessage: 'done',
-              padding: EdgeInsets.all(6),
-              label: Text(e.name),
-              avatar: CircleAvatar(
-                child: Icon(Icons.food_bank),
-              ),
-              onDeleted: () async {
-                print('deleting');
-                setState(() {
-                  widget.list.removeAt(index);
-                });
-
-                // if (await e.done('des', TimeDate.now())) {
-                //   setState(() {
-                //     widget.list.removeAt(index);
-                //   });
-                // }
-              },
-              deleteIcon: Icon(Icons.done),
-            );
-          }),
+        child: SingleChildScrollView(
+          child: Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: List<Widget>.generate(widget.list==null?0:widget.list, (index) {
+              var e = widget.list[index];
+              return Chip(
+                deleteButtonTooltipMessage: 'done',
+                padding: EdgeInsets.all(6),
+                label: Text(e.name),
+                avatar: CircleAvatar(
+                  child: Icon(Icons.food_bank),
+                ),
+                onDeleted: () async {
+                  if (await e.done('des', TimeDate.now())) {
+                    setState(() {
+                      widget.list.removeAt(index);
+                    });
+                  }
+                },
+                deleteIcon: Icon(Icons.done),
+              );
+            }),
+          ),
         ),
       ),
     );

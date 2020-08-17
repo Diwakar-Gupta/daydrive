@@ -20,11 +20,7 @@ Future<Database> main() async {
     path,
     onCreate: (db, version) {
       db.execute(
-        'CREATE TABLE datetime (pk	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,	year	INTEGER NOT NULL,	"month"	INTEGER NOT NULL,	"date"	INTEGER NOT NULL,	"hour"	INTEGER NOT NULL,	"min"	INTEGER NOT NULL);',
-      );
-      db.execute(
-        'CREATE TABLE act (	"pk"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,	"name"	TEXT NOT NULL,	"des"	TEXT NOT NULL,	"starttime"	INTEGER NOT NULL,	"endtime"	INTEGER);',
-      );
+          'CREATE TABLE "act" (	"pk"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,	"name"	TEXT NOT NULL,	"sdes"	TEXT NOT NULL,	"startdatetime"	INTEGER,	"edes"	INTEGER,	"enddatetime"	INTEGER);');
     },
     // Set the version. This executes the onCreate function and provides a
     // path to perform database upgrades and downgrades.
@@ -35,59 +31,59 @@ Future<Database> main() async {
 Future<Database> database = main();
 
 class TimeDate {
-  int date; //YYYYMMDD
-  int time; //HHMM
+  int datetime; //YYYYMMDDHHMM
 
-  TimeDate({this.date, this.time});
+  TimeDate({this.datetime});
 
   static create({int year, int month, day, hour, min}) {
-    int date = year * 10000 + month * 100 + day;
-    int time = hour * 100 + min;
-    return TimeDate(time: time, date: date);
+    int datetime =
+        year * 100000000 + month * 1000000 + day * 10000 + hour * 100 + min;
+    return TimeDate(datetime: datetime);
+  }
+
+  static TimeDate from(DateTime dt) {
+    return create(
+        year: dt.year,
+        month: dt.month,
+        day: dt.day,
+        hour: dt.hour,
+        min: dt.minute);
   }
 
   static TimeDate now() {
-    var dt = DateTime.now();
-    int date = 0;
-    int time = 0;
-
-    date = dt.year * 10000 + dt.month * 100 + dt.day;
-    time = dt.hour * 100 + dt.minute;
-    return TimeDate(time: time, date: date);
-  }
-
-  int day() {
-    return date % 100;
-  }
-
-  int month() {
-    return (date ~/ 100) % 100;
+    return from(DateTime.now());
   }
 
   int year() {
-    return (date ~/ 10000);
+    return (datetime % 1000000000000) ~/ 100000000;
+  }
+
+  int month() {
+    return (datetime % 100000000) ~/ 1000000;
+  }
+
+  int day() {
+    return (datetime % 1000000) ~/ 10000;
   }
 
   int hour() {
-    return time ~/ 100;
+    return (datetime % 10000) ~/ 100;
   }
 
   int min() {
-    return time % 100;
+    return datetime % 100;
   }
 }
 
 /*
 CREATE TABLE "act" (
-	"pk"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	"name"	TEXT NOT NULL,
-	"sdes"	TEXT NOT NULL,
-	"starttime"	INTEGER,
-	"startdate"	INTEGER,
-	"edes"	INTEGER,
-	"endtime"	INTEGER,
-	"enddate"	INTEGER
-);
+  	"pk"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+    "name"	TEXT NOT NULL,	
+    "sdes"	TEXT NOT NULL,	
+    "startdatetime"	INTEGER,	
+    "edes"	INTEGER,	
+    "enddatetime"	INTEGER
+  );
 */
 // take in range // SELECT * FROM act WHERE starttime >= 20200311 AND starttime <= 20200312;
 class Act {
@@ -95,26 +91,44 @@ class Act {
   String name;
   String sdes, edes;
 
-  TimeDate starttime;
-  TimeDate endtime = TimeDate(time: 0, date: 0);
+  TimeDate startdatetime;
+  TimeDate enddatetime = TimeDate(datetime: 0);
 
   Act(
       {this.name,
       this.sdes = "",
-      this.starttime,
+      this.startdatetime,
       this.edes = "",
-      this.endtime,
+      this.enddatetime,
       this.pk = 0});
+
+  static Act from(Map map) {
+    var pk = map['pk'];
+    var name = map['name'];
+    var sdes = map['sdes'];
+    var startdatetime = map['starttime'];
+    var edes = '';
+    if (map.containsKey('edes')) edes = map['edes'];
+    var enddatetime = 0;
+    if (map.containsKey('enddatetime')) edes = map['enddatetime'];
+    return Act(
+        name: name,
+        sdes: sdes,
+        startdatetime: TimeDate(datetime: startdatetime),
+        edes: edes,
+        enddatetime: TimeDate(datetime: enddatetime),
+        pk: pk);
+  }
 
   Future<bool> done(String des, TimeDate endtime) async {
     this.edes = des;
-    this.endtime = endtime;
+    this.enddatetime = endtime;
     await update();
     return true;
   }
 
   static Future<Act> create({String name, String sdes}) async {
-    var obj = Act(name: name, sdes: sdes, starttime: TimeDate.now());
+    var obj = Act(name: name, sdes: sdes, startdatetime: TimeDate.now());
     await obj.insert();
     return obj;
   }
@@ -123,11 +137,9 @@ class Act {
     return {
       'name': name,
       'sdes': sdes,
-      'starttime': starttime.time,
-      'startdate': starttime.date,
+      'startdatetime': startdatetime.datetime,
       'edes': edes,
-      'endtime': endtime.time,
-      'enddate': endtime.date,
+      'enddatetime': enddatetime.datetime,
     };
   }
 
@@ -145,6 +157,31 @@ class Act {
     );
   }
 
+  static Future<List<Act>> inRange({TimeDate from, TimeDate to}) async {
+    final Database db = await database;
+    var args = [];
+    String filter = "";
+    if (from == null && to == null) {
+      filter = '1==1';
+    } else {
+      if (from != null) {
+        filter += 'startdatetime >= ?';
+        args.add(from.datetime);
+      }
+      if (to != null) {
+        if (filter.length > 0) filter += ' AND ';
+        filter += 'enddatetime <= ?';
+        args.add(to.datetime);
+      }
+    }
+    final List<Map<String, dynamic>> maps =
+        await db.query('act', where: filter, whereArgs: args, orderBy: 'pk');
+
+    return List<Act>.generate(maps.length, (index) {
+      return Act.from(maps[index]);
+    });
+  }
+
   static Future<List<Act>> all() async {
     // Get a reference to the database.
     final Database _db = await database;
@@ -155,18 +192,12 @@ class Act {
     print("all dog");
 
     return List.generate(maps.length, (i) {
-      print(maps[i]['name'].runtimeType);
-      print(maps[i]['des'].runtimeType);
-      print(maps[i]['starttime'].runtimeType);
-      print(maps[i]['pk'].runtimeType);
-
       return Act(
         name: maps[i]['name'],
         sdes: maps[i]['des'],
-        starttime:
-            TimeDate(time: maps[i]['starttime'], date: maps[i]['startdate']),
+        startdatetime: TimeDate(datetime: maps[i]['starttime']),
         edes: maps[i]['edes'],
-        endtime: TimeDate(time: maps[i]['endtime'], date: maps[i]['enddate']),
+        enddatetime: TimeDate(datetime: maps[i]['endtime']),
         pk: maps[i]['pk'],
       );
     });
@@ -176,7 +207,6 @@ class Act {
     // Get a reference to the database.
     final Database _db = await database;
     // Update the given Dog.
-    print("updating dog");
     await _db.update(
       'act',
       toMap(),

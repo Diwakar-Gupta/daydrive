@@ -1,19 +1,40 @@
+import 'package:daydrive/models/act.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
 class ActTimeline extends StatefulWidget {
+  final List<Act> list;
+  ActTimeline(this.list);
+
   @override
-  ActTimelineState createState() => ActTimelineState();
+  ActTimelineState createState() => ActTimelineState(list);
 }
 
 class ActTimelineState extends State<ActTimeline> {
   List<ActData> _firstHalf;
 
-  @override
-  void initState() {
-    _firstHalf = _generateData();
-    super.initState();
+  ActTimelineState(List<Act> list) {
+    _firstHalf = [];
+    for (var e in list) {
+      var actdata = ActData(
+          name: e.name,
+          des: e.sdes,
+          hr: e.startdatetime.hour(),
+          mm: e.startdatetime.min(),
+          status: Status.start);
+      _firstHalf.add(actdata);
+
+      if (e.enddatetime.datetime != 0) {
+        var actdata = ActData(
+            name: e.name,
+            des: e.edes,
+            hr: e.enddatetime.hour(),
+            mm: e.enddatetime.min(),
+            status: Status.end);
+        _firstHalf.add(actdata);
+      }
+    }
   }
 
   @override
