@@ -345,7 +345,7 @@ class _TimelineActIndicator extends StatelessWidget {
         child: Text(
           time,
           style: GoogleFonts.dosis(
-            fontSize: 15,
+            fontSize: 13,
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),

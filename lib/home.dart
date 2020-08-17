@@ -14,7 +14,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    Act.inRange(to: TimeDate(datetime: 0)).then((value) => list = value);
+    Act.inRange(to: TimeDate(datetime: 0)).then((value) {
+      setState(() {
+        list = value;
+      });
+    });
   }
 
   @override
@@ -69,9 +73,12 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
         ),
         Spacer(),
-        _ActivePicker(
-          list: list,
-        )
+        if(list==null)
+          CircularProgressIndicator()
+          else
+            _ActivePicker(
+            list: list.where((element) => element.enddatetime.datetime==0).toList(),
+          )
       ],
     );
   }
@@ -149,7 +156,7 @@ class _CreateAct extends StatelessWidget {
         child: RaisedButton(
           onPressed: () {
             ActCreate(Act(
-                    name: titlecontroler.text, startdatetime: TimeDate.now(), enddatetime: TimeDate(datetime: 0)))
+                    name: titlecontroler.text,sdes: descontroler.text, startdatetime: TimeDate.now(), enddatetime: TimeDate(datetime: 0)))
                 .dispatch(context);
           },
           child: Text(
@@ -182,7 +189,7 @@ class __ActivePickerState extends State<_ActivePicker> {
           child: Wrap(
             spacing: 6,
             runSpacing: 6,
-            children: List<Widget>.generate(widget.list==null?0:widget.list, (index) {
+            children: List<Widget>.generate(widget.list.length, (index) {
               var e = widget.list[index];
               return Chip(
                 deleteButtonTooltipMessage: 'done',

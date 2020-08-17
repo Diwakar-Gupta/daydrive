@@ -10,7 +10,7 @@ Future<Database> main() async {
 
   final path = join(await getDatabasesPath(), 'database2.db');
 
-  await deleteDatabase(path);
+  // await deleteDatabase(path);
 
   return openDatabase(
     // Set the path to the database. Note: Using the `join` function from the
