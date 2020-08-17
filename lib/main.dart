@@ -1,7 +1,5 @@
-
+import 'package:daydrive/home.dart';
 import 'package:flutter/material.dart';
-
-import 'timeline/football_timeline.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,27 +14,23 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        textTheme: TextTheme(),
+        splashColor: Colors.transparent
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: ShowcaseFootballTimeline()
+      home: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF117E69),
+              Color(0xFF383A47),
+            ],
+          ),
+        ),
+        padding: const EdgeInsets.all(8.0),
+        child: HomeScreen(),
+      ),
     );
   }
 }
