@@ -156,7 +156,7 @@ class Act {
     );
   }
 
-  static Future<List<Act>> inRange({TimeDate from, TimeDate to}) async {
+  static Future<List<Act>> inRange({TimeDate from, TimeDate to, bool or}) async {
     final Database db = await database;
     var args = [];
     String filter = "";
@@ -168,7 +168,7 @@ class Act {
         args.add(from.datetime);
       }
       if (to != null) {
-        if (filter.length > 0) filter += ' AND ';
+        if (filter.length > 0) filter += or? ' OR ' : ' AND ';
         filter += 'enddatetime <= ?';
         args.add(to.datetime);
       }

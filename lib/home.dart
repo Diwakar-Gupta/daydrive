@@ -14,7 +14,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    Act.inRange(to: TimeDate(datetime: 0)).then((value) {
+    Act.inRange(from: TimeDate.from(DateTime.now().subtract(Duration(days: 1))), to: TimeDate(datetime: 0), or: true)
+        .then((value) {
       setState(() {
         list = value;
       });
@@ -47,8 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
               alignment: Alignment.topRight,
               child: FlatButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (contex) => ActTimeline(list)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (contex) => ActTimeline(list)));
                   },
                   child: Text(
                     'timeline',
@@ -73,11 +76,13 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
         ),
         Spacer(),
-        if(list==null)
+        if (list == null)
           CircularProgressIndicator()
-          else
-            _ActivePicker(
-            list: list.where((element) => element.enddatetime.datetime==0).toList(),
+        else
+          _ActivePicker(
+            list: list
+                .where((element) => element.enddatetime.datetime == 0)
+                .toList(),
           )
       ],
     );
@@ -156,7 +161,10 @@ class _CreateAct extends StatelessWidget {
         child: RaisedButton(
           onPressed: () {
             ActCreate(Act(
-                    name: titlecontroler.text,sdes: descontroler.text, startdatetime: TimeDate.now(), enddatetime: TimeDate(datetime: 0)))
+                    name: titlecontroler.text,
+                    sdes: descontroler.text,
+                    startdatetime: TimeDate.now(),
+                    enddatetime: TimeDate(datetime: 0)))
                 .dispatch(context);
           },
           child: Text(
