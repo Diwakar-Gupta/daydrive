@@ -91,8 +91,7 @@ class ActTimelineState extends State<ActTimeline> {
                           delegate: SliverChildListDelegate(<Widget>[
                             const _MessageTimeline(
                               message:
-                                  'There will be no more action in this match as the referee signals full time.'
-                                  ' Arsenal goes home with the victory!',
+                                  'Thats all',
                             ),
                           ]),
                         ),

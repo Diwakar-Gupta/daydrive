@@ -106,17 +106,16 @@ class Act {
     var pk = map['pk'];
     var name = map['name'];
     var sdes = map['sdes'];
-    var startdatetime = map['starttime'];
+    var startdatetime = TimeDate(datetime:map['startdatetime']);
     var edes = '';
     if (map.containsKey('edes')) edes = map['edes'];
-    var enddatetime = 0;
-    if (map.containsKey('enddatetime')) edes = map['enddatetime'];
+    var enddatetime = TimeDate(datetime:map['enddatetime']);
     return Act(
         name: name,
         sdes: sdes,
-        startdatetime: TimeDate(datetime: startdatetime),
+        startdatetime: startdatetime,
         edes: edes,
-        enddatetime: TimeDate(datetime: enddatetime),
+        enddatetime: enddatetime,
         pk: pk);
   }
 
@@ -177,9 +176,11 @@ class Act {
     final List<Map<String, dynamic>> maps =
         await db.query('act', where: filter, whereArgs: args, orderBy: 'pk');
 
-    return List<Act>.generate(maps.length, (index) {
+    var d = List<Act>.generate(maps.length, (index) {
       return Act.from(maps[index]);
     });
+    print(d);
+    return d;
   }
 
   static Future<List<Act>> all() async {
