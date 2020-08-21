@@ -35,6 +35,10 @@ class ActTimelineState extends State<ActTimeline> {
         _firstHalf.add(actdata);
       }
     }
+
+    _firstHalf.sort((a, b) {
+      return a.hr != b.hr ? a.hr - b.hr : a.mm - b.mm;
+    });
   }
 
   @override
@@ -90,8 +94,7 @@ class ActTimelineState extends State<ActTimeline> {
                         SliverList(
                           delegate: SliverChildListDelegate(<Widget>[
                             const _MessageTimeline(
-                              message:
-                                  'Thats all',
+                              message: 'Thats all',
                             ),
                           ]),
                         ),

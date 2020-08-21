@@ -204,7 +204,7 @@ class __ActivePickerState extends State<_ActivePicker> {
                 padding: EdgeInsets.all(6),
                 label: Text(e.name),
                 avatar: CircleAvatar(
-                  child: Icon(Icons.food_bank),
+                  child: Icon(Icons.search),
                 ),
                 onDeleted: () async {
                   if (await e.done('des', TimeDate.now())) {

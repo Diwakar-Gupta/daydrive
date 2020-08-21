@@ -179,7 +179,6 @@ class Act {
     var d = List<Act>.generate(maps.length, (index) {
       return Act.from(maps[index]);
     });
-    print(d);
     return d;
   }
 
