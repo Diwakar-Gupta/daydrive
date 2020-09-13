@@ -23,7 +23,7 @@ jobs:
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: '1.9.1+hotfix.6'
-          channel: master
+      - run: flutter upgrade --force 
       - run: flutter pub get
       - run: flutter build apk
       
